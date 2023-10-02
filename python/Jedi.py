@@ -1,24 +1,14 @@
-mochila = ["agua", "peluche", "tiramisu", "cafe", "Sable de luz", "comunicador", "dinero", "espada"]
-Sable = 0
-cantidad = 0
+mochila = ["agua", "peluche", "tiramisu", "cafe", "sable de luz", "comunicador", "dinero", "espada"]
 
-def usar_la_fuerza():
-    global cantidad, Sable, i
-    
-    if i < 0:
-        print('La cantidad de objetos hallados fue', cantidad)
-        if Sable == 1:
-            print('Se ha encontrado el sable')
+def sacarSable(a, c = 0):
+    if a[-1] != "sable de luz" and len(a) != 1:
+        c = c + 1
+        return sacarSable(a[:-1], c)
+    else:
+        if a[-1] != "sable de luz":
+            print("No se ha encontrado el sable de luz")
         else:
-            print('No se ha encontrado el sable')
-        return
-    
-    cantidad += 1
-    print("Se encontro", mochila[i], "en la mochila despues de sacar")
-    if mochila[i] == "Sable de luz":
-        Sable = 1
-    i -= 1
-    usar_la_fuerza()
+            print("Se ha encontrado el sable de luz")
+        return c
 
-i = len(mochila) - 1
-usar_la_fuerza()
+print(sacarSable(mochila))
