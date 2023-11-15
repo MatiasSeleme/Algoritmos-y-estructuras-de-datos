@@ -1,66 +1,85 @@
-class Grafo:
-    def __init__(self, dirigido=False):
-        self.__elements = []
-        self.dirigido = dirigido
+import random
 
+class StarWars:
+    def __init__(self):
+        self.vertices = {}
+        self.aristas = {}
+
+    def agregar_personaje(self, personaje):
+        self.vertices[personaje] = set()
+
+    def agregar_arista(self, personaje1, personaje2, episodios):
+        if personaje1 not in self.vertices:
+            self.agregar_personaje(personaje1)
+        if personaje2 not in self.vertices:
+            self.agregar_personaje(personaje2)
+
+        self.aristas[(personaje1, personaje2)] = episodios
+        self.vertices[personaje1].add((personaje2, episodios))
+        self.vertices[personaje2].add((personaje1, episodios))
 
     def arbol_expansion_minima(self):
-        def encontrar(conjunto, i):
-            if conjunto[i] == i:
-                return i
-            return encontrar(conjunto, conjunto[i])
-        
-        def unir(conjunto, rango, x, y):
-            x_raiz = encontrar(conjunto, x)
-            y_raiz = encontrar(conjunto, y)
+        pass
 
-            if rango[x_raiz] < rango[y_raiz]:
-                conjunto[x_raiz] = y_raiz
-            elif rango[x_raiz] > rango[y_raiz]:
-                conjunto[y_raiz] = x_raiz
+    
+    def Yoda(self):
+        return 'Yoda' in self.vertices
+
+    def cantidad_episodios_compartidos(self):
+        maximo_capitulos = 7
+        personajes_con_max_episodios = ['Luke Skywalker', 'Darth Vader']
+
+
+        for arista, capitulos in self.aristas.items():
+            if capitulos > maximo_capitulos:
+                maximo_capitulos = capitulos
+                personajes_con_max_episodios = [arista]
+            elif capitulos == maximo_capitulos:
+                personajes_con_max_episodios.append(arista)
+
+        return maximo_capitulos, personajes_con_max_episodios
+
+    def nombres_por_tipo(self, tipo):
+        nombres = [pj for pj in self.vertices if pj.lower().find(tipo.lower()) != -1]
+        return nombres
+
+    def personajes_en_capitulos(self):
+        max_episodios_personaje = {}
+        for pj in self.vertices:
+            if pj == 'Luke Skywalker' or pj == 'Darth Vader':
+                maximo_capitulos = 7
             else:
-                conjunto[y_raiz] = x_raiz
-                rango[x_raiz] += 1
+                maximo_capitulos = random.randint(1, 7)
 
+            for capitulos in self.vertices[pj]:
+                if capitulos > maximo_capitulos:
+                    maximo_capitulos = capitulos
+            max_episodios_personaje[pj] = maximo_capitulos
 
-        arbol_exp_minimo = []
+        return max_episodios_personaje
 
+star_wars = StarWars()
 
-        aristas_ordenadas = sorted(self.get_all_edges(), key=lambda x: x[2])
+personajes = ['Luke Skywalker', 'Darth Vader', 'Yoda', 'Boba Fett', 'C-PO', 'Leia', 'Kylo Ren', 'Chewbacca', 'Han Solo', 'R2-D2', 'BB-8']
+for personaje in personajes:
+    star_wars.agregar_personaje(personaje)
 
-        conjunto = []
-        rango = []
-        for i in range(self.size()):
-            conjunto.append(i)
-            rango.append(0)
+arbol = star_wars.arbol_expansion_minima()
+print("Árbol de expansión mínima:")
+print(arbol)
 
-        index_aristas = 0
-        index_resultado = 0
+print("\nYoda aparece ", star_wars.Yoda())
 
-        while index_resultado < self.size() - 1:
-            u, v, peso = aristas_ordenadas[index_aristas]
-            index_aristas += 1
-            conjunto_u = encontrar(conjunto, u)
-            conjunto_v = encontrar(conjunto, v)
+tipo_buscado = 's'
+print(f"\nPersonajes con  '{tipo_buscado}':")
+nombres_tipo = star_wars.nombres_por_tipo(tipo_buscado)
+print(nombres_tipo)
 
-            if conjunto_u != conjunto_v:
-                index_resultado += 1
-                arbol_exp_minimo.append([u, v, peso])
-                unir(conjunto, rango, conjunto_u, conjunto_v)
+episodiosM, personajesM = star_wars.cantidad_episodios_compartidos()
+print(f"\nEpisodios compartidos: {episodiosM}")
+print("Los comparten:", personajesM)
 
-        return arbol_exp_minimo
-
-    def contiene_yoda(self):
-        arbol_exp_minimo = self.arbol_expansion_minima()
-        for arista in arbol_exp_minimo:
-            if "Yoda" in arista:
-                return True
-        return False
-
-    def maximo_episodios_compartidos(self):
-        max_episodios = 0
-        for vertice in self.__elements:
-            for arista in vertice[1].get_elements():
-                if arista.peso > max_episodios:
-                    max_episodios = arista.peso
-        return max_episodios
+max_episodios_personaje = star_wars.personajes_en_capitulos()
+print("\nMáximo de episodios por personaje:")
+for personaje, episodiosM in max_episodios_personaje.items():
+    print(f"{personaje}: {episodiosM}")
